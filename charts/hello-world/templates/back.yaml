@@ -90,22 +90,22 @@ spec:
                 key: region
           - name: AWS_REGION
             valueFrom:
-              secretKeyRef: 
+              configMapKeyRef: 
                 name: aws-sdk
                 key: AWS_REGION
           - name: SERVER_HOST
             valueFrom:
-              secretKeyRef: 
+              configMapKeyRef: 
                 name: server-set
                 key: SERVER_HOST
           - name: SERVER_PORT
             valueFrom:
-              secretKeyRef: 
+              configMapKeyRef: 
                 name: server-set
                 key: SERVER_PORT
           - name: SERVER_READ_TIMEOUT
             valueFrom:
-              secretKeyRef: 
+              configMapKeyRef: 
                 name: server-set
                 key: SERVER_READ_TIMEOUT
 
