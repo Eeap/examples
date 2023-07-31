@@ -16,7 +16,7 @@ spec:
     spec:
       serviceAccountName: {{ include "terraform-canvas.serviceAccountName" . }}
       containers:
-        - name: {{ .Chart.Name }}-back
+      - name: {{ .Chart.Name }}-back
         image: {{ .Values.image.repository.backend}}
         ports:
         - name: http
