@@ -7,8 +7,8 @@ replicaCount: 2
 
 image:
   repository:
-    frontend: "iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92"
-    backend:  "iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92"
+    frontend: iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92
+    backend:  iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
