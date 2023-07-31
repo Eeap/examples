@@ -1,33 +1,150 @@
+# frontend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hello-world.fullname" . }}
+  name: {{ include "terraform-canvas.fullname" . }}-front
   labels:
-    {{- include "hello-world.labels" . | nindent 4 }}
+    app: {{ include "terraform-canvas.name" . }}-front
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "hello-world.selectorLabels" . | nindent 6 }}
+      app: {{ include "terraform-canvas.name" . }}-front
   template:
     metadata:
       labels:
-        {{- include "hello-world.selectorLabels" . | nindent 8 }}
+        app: {{ include "terraform-canvas.name" . }}-front
     spec:
-      serviceAccountName: {{ include "hello-world.serviceAccountName" . }}
+      serviceAccountName: {{ include "terraform-canvas.serviceAccountName" . }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+      - name: {{ .Chart.Name }}-front
+        image: {{ .Values.image.repository.frontend}}
+        ports:
+        - name: http
+          containerPort: {{ .Values.frontend.lb.http.targetPort}}
+          protocol: TCP
+
+---
+# backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "terraform-canvas.fullname" . }}-back
+  labels:
+    app: {{ include "terraform-canvas.name" . }}-back
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "terraform-canvas.name" . }}-back
+  template:
+    metadata:
+      labels:
+        app: {{ include "terraform-canvas.name" . }}-back
+    spec:
+      serviceAccountName: {{ include "terraform-canvas.serviceAccountName" . }}
+      containers:
+      - name: {{ .Chart.Name }}-back
+        image: {{ .Values.image.repository.backend}}
+        ports:
+        - name: http
+          containerPort: {{ .Values.backend.lb.http.targetPort}}
+          protocol: TCP
+        env:
+          # Secret
+          - name: tenancyID
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: tenancyID
+
+          - name: userID
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: userID
+
+          - name: fingerprint
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: fingerprint
+
+          - name: privateKey
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: privateKey
+
+          - name: compartmentID
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: compartmentID
+
+          - name: privateKeyPass
+          valueFrom:
+            secretKeyRef: 
+              name: oci-sdk
+              key: privateKeyPass
+          - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef: 
+              name: jwt-config
+              key: JWT_SECRET_KEY
+
+          - name: JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT
+          valueFrom:
+            secretKeyRef: 
+              name: jwt-config
+              key: JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT
+
+          - name: JWT_REFRESH_KEY
+          valueFrom:
+            secretKeyRef: 
+              name: jwt-config
+              key: JWT_REFRESH_KEY
+
+          - name: JWT_REFRESH_KEY_EXPIRE_HOURS_COUNT
+          valueFrom:
+            secretKeyRef: 
+              name: jwt-config
+              key: JWT_REFRESH_KEY_EXPIRE_HOURS_COUNT
+          - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef: 
+              name: aws-sdk
+              key: AWS_ACCESS_KEY
+          - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef: 
+              name: aws-sdk
+              key: AWS_SECRET_KEY
+          # configMap
+          - name: region
+          valueFrom:
+            configMapKeyRef: 
+              name: oci-sdk
+              key: region
+
+          - name: AWS_REGION
+          valueFrom:
+            secretKeyRef: 
+              name: aws-sdk
+              key: AWS_REGION
+
+          - name: SERVER_HOST
+          valueFrom:
+            secretKeyRef: 
+              name: server-set
+              key: SERVER_HOST
+          - name: SERVER_PORT
+          valueFrom:
+            secretKeyRef: 
+              name: server-set
+              key: SERVER_PORT
+          - name: SERVER_READ_TIMEOUT
+          valueFrom:
+            secretKeyRef: 
+              name: server-set
+              key: SERVER_READ_TIMEOUT

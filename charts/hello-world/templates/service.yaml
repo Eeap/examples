@@ -1,15 +1,33 @@
+# frontend
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "hello-world.fullname" . }}
+  name: "front-service"
   labels:
-    {{- include "hello-world.labels" . | nindent 4 }}
+    {{- include "terraform-canvas.labels" . | nindent 4 }}-front
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.frontend.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  - name: http
+    port: {{ .Values.frontend.service.http.servicePort }}
+    targetPort: {{ .Values.frontend.service.http.targetPort }}
+    protocol: TCP
   selector:
-    {{- include "hello-world.selectorLabels" . | nindent 4 }}
+    app: {{ include "terraform-canvas.name" . }}-front
+
+---
+# backend
+apiVersion: v1
+kind: Service
+metadata:
+  name: "back-service"
+  labels:
+    {{- include "terraform-canvas.labels" . | nindent 4 }}-back
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+  - port: {{ .Values.backend.service.servicePort }}
+    targetPort: {{ .Values.backend.service.targetPort }}
+    protocol: TCP
+  selector:
+    app: {{ include "terraform-canvas.name" . }}-back

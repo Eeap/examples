@@ -6,10 +6,12 @@
 replicaCount: 1
 
 image:
-  repository: nginx@latest
+  repository:
+    frontend: "iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92"
+    backend:  "iad.ocir.io/idklmfs5zwub/terraform_canvas:d3f59a7032f741bb8845d0c7e14d11ebe3959a92"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: latest
 
 nameOverride: ""
 fullnameOverride: ""
@@ -18,11 +20,30 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations: {
+  }
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
-service:
-  type: ClusterIP
-  port: 80
+  
+frontend:
+  lb:
+    type: LoadBalancer
+    http:
+      servicePort: 80
+      targetPort: 3000
+  service:
+    type: NodePort
+    http:
+      servicePort: 80
+      targetPort: 3000
+  
+backend:
+  lb:
+    type: LoadBalancer
+    servicePort: 8000
+    targetPort: 8000
+  service:
+    type: NodePort
+    servicePort: 8000
+    targetPort: 8000
