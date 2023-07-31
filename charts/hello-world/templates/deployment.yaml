@@ -23,9 +23,8 @@ spec:
         - name: http
           containerPort: {{ .Values.frontend.lb.http.targetPort}}
           protocol: TCP
-
----
 # backend
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
