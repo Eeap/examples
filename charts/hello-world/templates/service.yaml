@@ -26,8 +26,8 @@ metadata:
 spec:
   type: {{ .Values.backend.service.type }}
   ports:
-  - port: {{ .Values.backend.service.servicePort }}
-    targetPort: {{ .Values.backend.service.targetPort }}
+  - port: {{ .Values.backend.service.http.servicePort }}
+    targetPort: {{ .Values.backend.service.http.targetPort }}
     protocol: TCP
   selector:
     app: {{ include "terraform-canvas.name" . }}-back
