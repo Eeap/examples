@@ -1,30 +1,3 @@
-# frontend
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "terraform-canvas.fullname" . }}-front
-  labels:
-    app: {{ include "terraform-canvas.name" . }}-front
-spec:
-  replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      app: {{ include "terraform-canvas.name" . }}-front
-  template:
-    metadata:
-      labels:
-        app: {{ include "terraform-canvas.name" . }}-front
-    spec:
-      serviceAccountName: {{ include "terraform-canvas.serviceAccountName" . }}
-      containers:
-      - name: {{ .Chart.Name }}-front
-        image: {{ .Values.image.repository.frontend}}
-        ports:
-        - name: http
-          containerPort: {{ .Values.frontend.lb.http.targetPort}}
-          protocol: TCP
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -135,3 +108,19 @@ spec:
             secretKeyRef: 
               name: server-set
               key: SERVER_READ_TIMEOUT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "back-service"
+  labels:
+    {{- include "terraform-canvas.labels" . | nindent 4 }}-back
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+  - port: {{ .Values.backend.service.http.servicePort }}
+    targetPort: {{ .Values.backend.service.http.targetPort }}
+    protocol: TCP
+  selector:
+    app: {{ include "terraform-canvas.name" . }}-back
